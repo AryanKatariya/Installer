@@ -6,7 +6,6 @@ declare -A tools='(
 ["git"]="apt install git -y -qq"
 ["python3"]="apt install python${Lpython}"
 ["pip3"]="apt install python3-pip -y -qq"
-["pipx"]="sudo apt install pipx -y -qq &> /dev/null"
 ["hakrawler"]="go install github.com/hakluke/hakrawler@latest"
 ["cariddi"]="go install github.com/edoardottt/cariddi/cmd/cariddi@latest"
 ["gospider"]="go install github.com/jaeles-project/gospider@latest"
@@ -39,7 +38,7 @@ function check(){
 	#+++++++++++++++++++++++++++++++++GO+++++++++++++++++++++++++++++++++++++++++++++++++
 	if go version &> /dev/null
 	then
-		echo "go version | cut -d " " -f 3"
+		echo -e "\n[+] go\t\t:\t`go version | awk -F" " '{print $3}'`\n"
 	else
 		echo "Install go manually OR run \"bash installer.sh -i\""
 	fi
@@ -79,18 +78,40 @@ function check(){
             	elif [[ ${i} == "waymore" ]];then
 			echo -e "[+] ${i}\t:\t`curl -kLs "https://raw.githubusercontent.com/xnl-h4ck3r/waymore/main/waymore/__init__.py" | awk -F'"' '{print $2}'`\n"
             	elif [[ ${i} == "hakrawler" ]];then
-                	echo -e "[+] ${i}\t:\t2.1$\n"
+                	echo -e "[+] ${i}\t:\t2.1\n"
             	elif [[ ${i} == "cariddi" ]];then
                 	echo -e "[+] ${i}\t:\t`cariddi -version 2>&1| egrep -o "v[0-9.]+"`\n"
             	elif [[ ${i} == "crawley" ]];then
                 	echo -e "[+] ${i}\t:\t1.7.7\n"
 		elif [[ ${i} == "python3" ]];then
                         echo -e "[+] ${i}\t:\t`python3 -V | awk '{print $NF}' `\n"
+		elif [[ ${i} == "subfinder" ]];then
+                        echo -e "[+] ${i}\t:\t`subfinder -version 2>&1 | head -n 1 | cut -d " " -f 4`\n"
+		elif [[ ${i} == "ffuf" ]];then
+                        echo -e "[+] ${i}\t:\t`ffuf -V | awk '{print $NF}' | cut -d "-" -f 1`\n"
+		elif [[ ${i} == "jq" ]];then
+                        echo -e "[+] ${i}\t\t:\t`jq -V | cut -d "-" -f 2`\n"
+		elif [[ ${i} == "gobuster" ]];then
+                        echo -e "[+] ${i}\t:\t`gobuster version`\n"
             	fi
 	fi
 	done	
 
 }
+
+function progress_bar() {
+    local duration=$1
+    local interval=0.1
+    local steps=$(echo "$duration/$interval" | bc)
+    local bar=""
+    for ((i = 0; i < steps; i++)); do
+        bar="${bar}#"
+        printf "\r[%-50s] %d%%" "$bar" $((2 * i))
+        sleep $interval
+    done
+    echo ""
+}
+
 
 function install(){
 
@@ -139,11 +160,7 @@ function install(){
 			LATEST_GO_VERSION="$(curl --silent 'https://go.dev/VERSION?m=text' | head -n 1)";
                         LATEST_GO_DOWNLOAD_URL="https://go.dev/dl/${LATEST_GO_VERSION}.${PLATFORM}.tar.gz"
 
-			echo "${LATEST_GO_VERSION}"
-			echo "${LATEST_GO_DOWNLOAD_URL}"
-
 			current=`pwd`
-			echo $current
 				
 			echo -e "cd to home ($USER) directory \n"
                         cd $HOME
@@ -154,13 +171,17 @@ function install(){
 			echo -e "Extracting file...\n"
                         tar -xf ${HOME}/${LATEST_GO_VERSION}.linux-amd64.tar.gz -C ${HOME}
 
-			export GOROOT="$HOME/go" 2>&1 > /dev/null
-                        export GOPATH="$HOME/go/packages" 2>&1 > /dev/null
-                        export PATH=$PATH:$GOROOT/bin:$GOPATH/bin 2>&1 > /dev/null
+			echo "export GOROOT="\$HOME/go"" >> .bashrc
+                        echo "export GOPATH="\$HOME/go/packages"" >> .bashrc
+                        echo "export PATH=\$PATH:\$GOROOT/bin:\$GOPATH/bin" >> .bashrc
+
                         echo -e "APPENDING THIS LINE BELOW TO YOUR ~/.bashrc OR ~/.zshrc: \n
 					export GOROOT=\"$HOME/go\"\n
 					export GOPATH=\"$HOME/go/packages\"\n
 					export PATH=$PATH:$GOROOT/bin:$GOPATH/bin\n\n"
+			
+			source ~/.bashrc	
+			
 
 			cd ${current}
 	 fi
@@ -169,14 +190,29 @@ function install(){
 	for i in ${!tools[@]};do
 		${i} --help &> /dev/null
 		if [[ ! $? -eq 0 ]];then
-			echo "${tools[${i}]}"
+			echo -e "\nInstalling $i..."
+			echo "Running: ${tools[${i}]}"
 			${tools[${i}]}
 			if [[ $? -eq 0 ]];then
 				echo "Installing tool...: ${tools[${i}]}"
 				printf "[+] ${i} Installed\n"
 			fi
+	#		{ ${tools[$i]} > /tmp/${i}_install.log 2>&1; } &
+         #   		pid=$!
 
+        #    		# Show progress bar while the command runs
+         #   		while kill -0 $pid 2>/dev/null; do
+          #      	progress_bar 2
+           # 		done
 
+            		# Check if the command was successful
+            #		if wait $pid; then
+             #   		echo -e "\n[+] $i Installed Successfully."
+            #			else
+             #   			echo -e "\n[-] Failed to install $i. Check /tmp/${i}_install.log for details."
+            #		fi
+        #		else
+         #   			echo "[+] $i is already installed."
 		fi
     	done
 }
