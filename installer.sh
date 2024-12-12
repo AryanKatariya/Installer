@@ -1,11 +1,30 @@
+black='\e[38;5;016m'
+#black='\e[30m'
+greenbg='\e[48;5;038m'
+bluebg='\e[48;5;038m'${black}
+red='\e[31m'
+redbg='\e[30;41m'${black}
+lightred='\e[91m'
+blink='\e[5m'
+lightblue='\e[38;5;109m'
+green='\e[32m'
+greenbg='\e[48;5;038m'${black}
+yellow='\e[33m'
+logo='\033[0;36m'
+upper="${lightblue}╔$(printf '%.0s═' $(seq "80"))╗${end}"
+lower="${lightblue}╚$(printf '%.0s═' $(seq "80"))╝${end}"
+right=$(printf '\u2714')
+cross=$(printf '\u2718')
+end='\e[0m'
+
 Lpython=`wget -qO- https://www.python.org/ftp/python/ | grep -oP 'href="\d+\.\d+\.\d+/' | sed 's/href="//;s/\/$//' |  cut -d . -f 1,2 | sort -V | tail -n 2 | head -n 1`
 
 declare -A tools='(
-["curl"]="apt install curl -y -qq"
-["jq"]="apt install jq"
-["git"]="apt install git -y -qq"
-["python3"]="apt install python${Lpython}"
-["pip3"]="apt install python3-pip -y -qq"
+["curl"]="sudo apt install curl -y -qq"
+["jq"]="sudo apt install jq"
+["git"]="sudo apt install git -y -qq"
+["python3"]="sudo apt install python${Lpython}"
+["pip3"]="sudo apt install python3-pip -y -qq"
 ["hakrawler"]="go install github.com/hakluke/hakrawler@latest"
 ["cariddi"]="go install github.com/edoardottt/cariddi/cmd/cariddi@latest"
 ["gospider"]="go install github.com/jaeles-project/gospider@latest"
@@ -24,13 +43,15 @@ declare -A tools='(
 )'
 
 function help(){
-	echo -e "-p/--print\t:\tTo print all tools offered"
+	echo -e "-l/--list\t:\tTo list all tools offered"
 }
 
 function list_tool(){
+	i=1
 	for tool in "${!tools[@]}"
 	do
-		echo "$tool"
+		echo -e "${lightred}${i}.\t${yellow}$tool${end}"
+		((i++))
 	done
 }
 
@@ -38,7 +59,7 @@ function check(){
 	#+++++++++++++++++++++++++++++++++GO+++++++++++++++++++++++++++++++++++++++++++++++++
 	if go version &> /dev/null
 	then
-		echo -e "\n[+] go\t\t:\t`go version | awk -F" " '{print $3}'`\n"
+		echo -e "\n${green}[${right} ] go${end}\t\t:\t`go version | awk -F" " '{print $3}'`\n"
 	else
 		echo "Install go manually OR run \"bash installer.sh -i\""
 	fi
@@ -52,65 +73,65 @@ function check(){
 		if [[ ${i} == "gau" ]];then
 			echo -e "[-] ${i}\t\t:\tManually install: \`${tools[$i]}\` OR \`bash installer.sh -i/--install\`${end}\n"
 		else
-			echo -e "[-] ${i}\t:\tManually install: \`${tools[$i]}\` OR \`bash installer.sh -i/--install\`${end}\n"
+			echo -e "${red}[${cross} ] ${i}${end}\t:\t${redbg}Manually install: \`${tools[$i]}\` OR \`bash installer.sh -i/--install\`${end}\n"
 		fi
         else
 		if [[ ${i} == "waybackurls" ]];then
-                	echo -e  "[+] ${i}\t:\tv0.1.0\n"
+                	echo -e "${green}[${right} ] ${i}${end}:\tv0.1.0\n"
             	elif [[ ${i} == "gauplus" ]];then
-                	echo -e  "[+] ${i}\t:\t`gauplus -version | awk '{print $NF}'`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`gauplus -version | awk '{print $NF}'`\n"
             	elif [[ ${i} == "gospider" ]];then
-                	echo -e  "[+] ${i}\t:\t`gospider --version|head -1|awk '{print $NF}'`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`gospider --version|head -1|awk '{print $NF}'`\n"
             	elif [[ ${i} == "gau" ]];then
-                	echo -e "[+] ${i}\t\t:\t`gau --version|awk '{print $NF}'`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`gau --version|awk '{print $NF}'`\n"
             	elif [[ ${i} == "anew" ]];then
-                	echo -e  "[+] ${i}\t:\tv0.1.1\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\tv0.1.1\n"
             	elif [[ ${i} == "httpx" ]];then
-                	echo -e "[+] ${i}\t:\t`httpx -version 2>&1|grep "Current Version"| awk '{print $NF}'`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`httpx -version 2>&1|grep "Current Version"| awk '{print $NF}'`\n"
             	elif [[ ${i} == "katana" ]];then
-                	echo -e  "[+] ${i}\t:\t`katana --version 2>&1| tail -1 | awk '{print $NF}'`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`katana --version 2>&1| tail -1 | awk '{print $NF}'`\n"
             	elif [[ ${i} == "curl" ]];then
-                	echo -e "[+] ${i}\t:\t`curl --version|head -1|awk '{print $2}'`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`curl --version|head -1|awk '{print $2}'`\n"
            	elif [[ ${i} == "git" ]];then
-                	echo -e "[+] ${i}\t\t:\t`git --version|awk '{print $NF}'`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`git --version|awk '{print $NF}'`\n"
             	elif [[ ${i} == "pip3" ]];then
-                	echo -e "[+] ${i}\t:\t`pip3 --version|awk '{print $2}'`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`pip3 --version|awk '{print $2}'`\n"
             	elif [[ ${i} == "waymore" ]];then
-			echo -e "[+] ${i}\t:\t`curl -kLs "https://raw.githubusercontent.com/xnl-h4ck3r/waymore/main/waymore/__init__.py" | awk -F'"' '{print $2}'`\n"
+			echo -e "${green}[${right} ] ${i}${end}\t:\t`curl -kLs "https://raw.githubusercontent.com/xnl-h4ck3r/waymore/main/waymore/__init__.py" | awk -F'"' '{print $2}'`\n"
             	elif [[ ${i} == "hakrawler" ]];then
-                	echo -e "[+] ${i}\t:\t2.1\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t2.1\n"
             	elif [[ ${i} == "cariddi" ]];then
-                	echo -e "[+] ${i}\t:\t`cariddi -version 2>&1| egrep -o "v[0-9.]+"`\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t`cariddi -version 2>&1| egrep -o "v[0-9.]+"`\n"
             	elif [[ ${i} == "crawley" ]];then
-                	echo -e "[+] ${i}\t:\t1.7.7\n"
+                	echo -e "${green}[${right} ] ${i}${end}\t:\t1.7.7\n"
 		elif [[ ${i} == "python3" ]];then
-                        echo -e "[+] ${i}\t:\t`python3 -V | awk '{print $NF}' `\n"
+                        echo -e "${green}[${right} ] ${i}${end}\t:\t`python3 -V | awk '{print $NF}' `\n"
 		elif [[ ${i} == "subfinder" ]];then
-                        echo -e "[+] ${i}\t:\t`subfinder -version 2>&1 | head -n 1 | cut -d " " -f 4`\n"
+                        echo -e "${green}[${right} ] ${i}${end}\t:\t`subfinder -version 2>&1 | head -n 1 | cut -d " " -f 4`\n"
 		elif [[ ${i} == "ffuf" ]];then
-                        echo -e "[+] ${i}\t:\t`ffuf -V | awk '{print $NF}' | cut -d "-" -f 1`\n"
+                        echo -e "${green}[${right} ] ${i}${end}\t:\t`ffuf -V | awk '{print $NF}' | cut -d "-" -f 1`\n"
 		elif [[ ${i} == "jq" ]];then
-                        echo -e "[+] ${i}\t\t:\t`jq -V | cut -d "-" -f 2`\n"
+                        echo -e "${green}[${right} ] ${i}${end}\t\t:\t`jq -V | cut -d "-" -f 2`\n"
 		elif [[ ${i} == "gobuster" ]];then
-                        echo -e "[+] ${i}\t:\t`gobuster version`\n"
+                        echo -e "${green}[${right} ] ${i}${end}\t:\t`gobuster version`\n"
             	fi
 	fi
 	done	
 
 }
 
-function progress_bar() {
-    local duration=$1
-    local interval=0.1
-    local steps=$(echo "$duration/$interval" | bc)
-    local bar=""
-    for ((i = 0; i < steps; i++)); do
-        bar="${bar}#"
-        printf "\r[%-50s] %d%%" "$bar" $((2 * i))
-        sleep $interval
-    done
-    echo ""
-}
+#function progress_bar() {
+#    local duration=$1
+#    local interval=0.1
+#    local steps=$(echo "$duration/$interval" | bc)
+#    local bar=""
+#    for ((i = 0; i < steps; i++)); do
+#        bar="${bar}#"
+#        printf "\r[%-50s] %d%%" "$bar" $((2 * i))
+#        sleep $interval
+#    done
+#    echo ""
+#}
 
 
 function install(){
@@ -184,6 +205,8 @@ function install(){
 			
 
 			cd ${current}
+		else
+			echo -e "${green}[${right} ]${end} go is Already Installed\n"
 	 fi
 
 
@@ -195,31 +218,17 @@ function install(){
 			${tools[${i}]}
 			if [[ $? -eq 0 ]];then
 				echo "Installing tool...: ${tools[${i}]}"
-				printf "[+] ${i} Installed\n"
+				echo -e "${green}[${right} ]${end} ${i} Installed\n"
 			fi
-	#		{ ${tools[$i]} > /tmp/${i}_install.log 2>&1; } &
-         #   		pid=$!
-
-        #    		# Show progress bar while the command runs
-         #   		while kill -0 $pid 2>/dev/null; do
-          #      	progress_bar 2
-           # 		done
-
-            		# Check if the command was successful
-            #		if wait $pid; then
-             #   		echo -e "\n[+] $i Installed Successfully."
-            #			else
-             #   			echo -e "\n[-] Failed to install $i. Check /tmp/${i}_install.log for details."
-            #		fi
-        #		else
-         #   			echo "[+] $i is already installed."
+		else
+			echo -e "${green}[${right} ]${end} ${i} is Already Installed\n"
 		fi
     	done
 }
 
 function opt(){
 	case $1 in
-		'-p'|'--print')
+		'-l'|'--print')
 			list_tool
 			;;
 		'-c'|'--check')
