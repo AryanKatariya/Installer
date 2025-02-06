@@ -14,14 +14,15 @@ logo='\033[0;36m'
 upper="${lightblue}╔$(printf '%.0s═' $(seq "80"))╗${end}"
 lower="${lightblue}╚$(printf '%.0s═' $(seq "80"))╝${end}"
 right=$(printf '\u2714')
-cross=$(printf '\u2718')
+cross=$(printf '\xE2\x9C\x98')
+right=$(printf '\xE2\x9C\x94')
 end='\e[0m'
 
 Lpython=`wget -qO- https://www.python.org/ftp/python/ | grep -oP 'href="\d+\.\d+\.\d+/' | sed 's/href="//;s/\/$//' |  cut -d . -f 1,2 | sort -V | tail -n 2 | head -n 1`
 
 declare -A tools='(
 ["curl"]="sudo apt install curl -y -qq"
-["jq"]="sudo apt install jq"
+["jq"]="sudo apt install jq -y -qq"
 ["git"]="sudo apt install git -y -qq"
 ["python3"]="sudo apt install python${Lpython}"
 ["pip3"]="sudo apt install python3-pip -y -qq"
@@ -177,12 +178,13 @@ function install(){
                                 esac
 			
 
-			echo ${PLATFORM}
+			#echo ${PLATFORM}
 			LATEST_GO_VERSION="$(curl --silent 'https://go.dev/VERSION?m=text' | head -n 1)";
                         LATEST_GO_DOWNLOAD_URL="https://go.dev/dl/${LATEST_GO_VERSION}.${PLATFORM}.tar.gz"
 
 			current=`pwd`
-				
+			
+			echo -e "${green}Installing go version:${LATEST_GO_VERSION}${end}"	
 			echo -e "cd to home ($USER) directory \n"
                         cd $HOME
                         
@@ -192,19 +194,24 @@ function install(){
 			echo -e "Extracting file...\n"
                         tar -xf ${HOME}/${LATEST_GO_VERSION}.linux-amd64.tar.gz -C ${HOME}
 
-			echo "export GOROOT="\$HOME/go"" >> .bashrc
-                        echo "export GOPATH="\$HOME/go/packages"" >> .bashrc
-                        echo "export PATH=\$PATH:\$GOROOT/bin:\$GOPATH/bin" >> .bashrc
+			#echo 'export GOROOT="\$HOME/go"' >> .bashrc
+                        #echo 'export GOPATH="\$HOME/go/packages"' >> .bashrc
+                        #echo 'export PATH=\$PATH:\$GOROOT/bin:\$GOPATH/bin' >> .bashrc
 
-                        echo -e "APPENDING THIS LINE BELOW TO YOUR ~/.bashrc OR ~/.zshrc: \n
-					export GOROOT=\"$HOME/go\"\n
-					export GOPATH=\"$HOME/go/packages\"\n
-					export PATH=$PATH:$GOROOT/bin:$GOPATH/bin\n\n"
-			
-			source ~/.bashrc	
-			
+			export GOROOT="$HOME/go"
+			export GOPATH="$HOME/go/packages"
+			export PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 
-			cd ${current}
+
+			#echo -e "APPENDING THIS LINES TO YOUR ~/.bashrc OR ~/.zshrc: \n
+					#export GOROOT=\"$HOME/go\"\n
+					#export GOPATH=\"$HOME/go/packages\"\n
+					#export PATH=$PATH:$GOROOT/bin:$GOPATH/bin\n\n"
+			
+			`source ~/.bashrc`
+		        #exec bash	
+
+			#cd ${current}
 		else
 			echo -e "${green}[${right} ]${end} go is Already Installed\n"
 	 fi
