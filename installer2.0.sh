@@ -123,19 +123,6 @@ function check(){
 
 }
 
-#function progress_bar() {
-#    local duration=$1
-#    local interval=0.1
-#    local steps=$(echo "$duration/$interval" | bc)
-#    local bar=""
-#    for ((i = 0; i < steps; i++)); do
-#        bar="${bar}#"
-#        printf "\r[%-50s] %d%%" "$bar" $((2 * i))
-#        sleep $interval
-#    done
-#    echo ""
-#}
-
 
 function install(){
 
